@@ -1,14 +1,12 @@
 package github.com.miralhas.jwt101.domain.security;
 
-import github.com.miralhas.jwt101.domain.model.Role;
 import github.com.miralhas.jwt101.domain.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class SecurityUser implements UserDetails {
@@ -17,12 +15,9 @@ public class SecurityUser implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        Set<GrantedAuthority> authorities = new HashSet<>();
-        authorities.add(Role.Value.USER.getAuthority());
-        if (user.isAdmin()) {
-            authorities.add(Role.Value.ADMIN.getAuthority());
-        }
-        return authorities;
+        return user.getRoles().stream()
+                .map(role -> role.getName().getAuthority())
+                .collect(Collectors.toSet());
     }
 
     @Override

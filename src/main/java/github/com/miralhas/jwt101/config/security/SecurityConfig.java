@@ -16,6 +16,7 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -27,6 +28,7 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 
 import java.security.interfaces.RSAPrivateKey;
@@ -35,6 +37,7 @@ import java.security.interfaces.RSAPublicKey;
 @Configuration
 @EnableMethodSecurity
 @RequiredArgsConstructor
+@EnableWebSecurity(debug = true)
 public class SecurityConfig {
 
     @Value("${jwt.private.key}")
@@ -67,9 +70,11 @@ public class SecurityConfig {
                 })
                 .authorizeHttpRequests(authz -> {
                     authz.requestMatchers(HttpMethod.POST, "/api/users/login", "/api/users/create").permitAll();
+                    authz.requestMatchers(HttpMethod.GET, "/api/generic").permitAll();
                     authz.requestMatchers(HttpMethod.GET, "/api/users/admin").hasAnyRole("ADMIN");
                     authz.anyRequest().authenticated();
-                });
+                })
+                .addFilterAfter(new TestFilter(), BearerTokenAuthenticationFilter.class);
 
         return httpSecurity.build();
     }

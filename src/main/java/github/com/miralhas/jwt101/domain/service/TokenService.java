@@ -1,6 +1,5 @@
 package github.com.miralhas.jwt101.domain.service;
 
-import github.com.miralhas.jwt101.domain.model.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +22,7 @@ public class TokenService {
         Instant now = Instant.now();
         var scopes = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(" "));
+                .toList();
 
         JwtClaimsSet jwtClaimsSet = JwtClaimsSet.builder()
                 .issuer("aula-jwt")

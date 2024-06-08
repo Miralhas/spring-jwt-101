@@ -50,11 +50,12 @@ public class AuthenticationService {
 
 
     public Jwt authenticate(LoginInput loginInput) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginInput.getUsername(), loginInput.getPassword())
+        var authenticationToken = new UsernamePasswordAuthenticationToken(
+                loginInput.getUsername(), loginInput.getPassword()
         );
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        return tokenService.generateToken(authentication);
+        Authentication authenticationResult = authenticationManager.authenticate(authenticationToken);
+        SecurityContextHolder.getContext().setAuthentication(authenticationResult);
+        return tokenService.generateToken(authenticationResult);
     }
 
 
